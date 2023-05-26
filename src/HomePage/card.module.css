@@ -1,0 +1,23 @@
+.Ficon{
+    padding-left:120px ;
+}
+.Ficon:hover{
+    cursor: pointer;
+}
+.card{
+    padding: 40px;
+}
+.typo{
+    display: flex;
+    justify-content: flex-start;
+}
+.heading:hover{
+    cursor: pointer;
+    text-decoration: underline;
+   
+}
+.cardstyle{
+    display: inline-block;
+   
+    
+}
