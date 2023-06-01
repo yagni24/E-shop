@@ -8,11 +8,12 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import { Link } from "react-router-dom";
+import style from './loginstyle.module.css';
 export default function Loginpage(){
     const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
-
+    const [ferror,setEmptyF] = useState("");
     const [fName,setfName] = useState("");
    
     const handleChange =(fieldName,value)=>{
@@ -52,13 +53,18 @@ export default function Loginpage(){
       case email:
         alert('enter your email');
         break;
-      case fName:
-        alert('enter your fName');
+        case fName:
+          if (ferror===""){
+            setEmptyF('Enter Fname');
+         }
         break;
       case password:
-        alert('enter your password');
+          setPassword('Enter password');
         break;
       case confirmPass:
+        if(confirmPass===""){
+          setErrorpass("Enter your confirm password")
+        }
         alert('enter your confirmpass');
         break;
       default:
@@ -86,14 +92,19 @@ export default function Loginpage(){
   <label style={{ gridColumn: '1', marginBottom: '5px',justifySelf:'center',marginRight:'170px' }}>FullName</label>
   <div style={{ gridColumn: '1', display: 'flex', justifyContent: 'center' }}>
     <TextField
-      style={{ width: '250px' }}
+      style={{ width: '250px'}}
       id="demo-helper-text-misaligned"
-      // label="FullName"
+      // className={ferror ? style.error:''}
       color="secondary"
       onChange={(e)=>handleChange('fName',e.target.value)}
       value={fName}
       required
     />
+    {ferror && (
+        <Alert severity="error" style={{ marginTop: '5px' }}>
+          {ferror}
+        </Alert>
+      )}
   </div>
 </div>
      <div style={{ display: 'grid', gridTemplateColumns: '2fr', gap: '5px' }}>
@@ -136,6 +147,11 @@ export default function Loginpage(){
             }
           />
           </FormControl >
+          {password && (
+        <Alert severity="error" style={{ marginTop: '5px' }}>
+          {password}
+        </Alert>
+      )}
           </div>
 </div>    
 <div style={{ display: 'grid', gridTemplateColumns: '2fr', gap: '5px' }}>
