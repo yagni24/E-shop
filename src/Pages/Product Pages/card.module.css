@@ -6,6 +6,8 @@
 }
 .card{
     padding: 40px;
+  
+   
 }
 .typo{
     display: flex;
@@ -18,6 +20,10 @@
 }
 .cardstyle{
     display: inline-block;
-   
-    
+
+}
+.linkHover:hover{
+    cursor: pointer;
+    text-decoration: underline;
+    color: rgb(98, 98, 98);
 }

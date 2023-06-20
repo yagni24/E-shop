@@ -1,0 +1,26 @@
+.hoverEffect:hover{
+  text-decoration: underline;
+  color: rgb(219, 134, 255);
+
+}
+.hoverUndo{
+  margin-right: 0;
+}
+.hoverUndo:hover{
+  text-decoration: underline;
+  color: black;
+}
+.carousel{
+  height:100px;
+  width: 500px;
+}
+
+.appbar::selection{
+  background-color: blanchedalmond;
+}
+.contact:hover{
+  background-color: rgb(246, 238, 238);
+  cursor: pointer;
+  box-shadow:1px 2px #8f8e8c;
+  transition: 5ms;
+}

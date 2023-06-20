@@ -1,26 +1,43 @@
 
 import './App.css';
 import React from 'react';
-// import Product from './HomePage/Product';
-// import Singleproduct from './HomePage/Singleproduct';
-import {  Routes, Route} from 'react-router-dom';
-import Loginpage from './HomePage/Loginpage';
-import Product from './HomePage/Product';
-import Singleproduct from './HomePage/Singleproduct';
+import { Routes, Route } from 'react-router-dom';
+import Product from './Pages/Product Pages/Product';
+import Singleproduct from './Pages/Product Pages/Singleproduct';
+import Signup from './Pages/LoginPage/Signup';
+import Profile from './Pages/Profile/Profile';
+import { LoginProvider } from './Context/LoginContext';
+import { CookieProvider } from './Context/CookieContext';
+import Login  from './Pages/LoginPage/Login';
+import ProtectedRoute from './CustomRoutes/ProtectedRoute';
+import PrivateRoute from './CustomRoutes/PrivateRoute';
+
 
 function App() {
+
   return (
     <div className="App">
-   
-    
-    <Routes>
-      <Route path="/" element={<Loginpage/>}/>
-      <Route path="/Product" element={<Product/>}></Route>
-      <Route path="/Singleproduct/:id" element={<Singleproduct/>}/>
-    </Routes>
-     
+      <LoginProvider>
+      <CookieProvider>
+      <Routes>
+        <Route path="/" element={<Product/>} />
+        <Route path="/Profile" element={<ProtectedRoute>
+          <Profile/>
+        </ProtectedRoute>} />
+        <Route path="/Signup" element={<PrivateRoute>
+          <Signup/>
+        </PrivateRoute>}/>
+        <Route path="/Product" element={<Product/>}/>
+        <Route path="/Login" element={<PrivateRoute>
+          <Login/>
+        </PrivateRoute>}/>
+        <Route path="/Singleproduct" element={<Singleproduct/>}/>
+      </Routes>
+      </CookieProvider>
+      </LoginProvider>
+      
     </div>
-  );
+  );  
 }
 
 export default App;
