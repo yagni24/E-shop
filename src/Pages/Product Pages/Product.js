@@ -7,118 +7,61 @@ import GradeRoundedIcon from '@mui/icons-material/GradeRounded';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import { CardActionArea, CardActions } from '@mui/material';
 import styles from './card.module.css';
+import pagestyle from './pagination.module.css';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCallback } from 'react';
 import React1 from '../img/React1.jpg';
 import Navbarsep from '../Navbar/Navbar';
+import CircularProgress from '@mui/material/CircularProgress';
 import { CookieContext } from '../../Context/CookieContext';
 import Carousel from '../Product Pages/Carousel';
 import { LoginContext } from '../../Context/LoginContext';
 import { getDocs, collection } from "firebase/firestore";
-import { db, auth } from '../../config/firebase'
-// import axios from 'axios';
-
-// const usePagination = (data, itemsPerPage) => {
-//   const [currentPage, setCurrentPage] = useState(1);
-
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-
-//   const totalPages = Math.ceil(data.length / itemsPerPage);
-
-//   const nextPage = () => {
-//     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
-//   };
-
-//   const prevPage = () => {
-//     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-//   };
-
-//   const goToPage = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
-
-// return {
-//   currentPage,
-//   currentItems,
-//   totalPages,
-//   nextPage,
-//   prevPage,
-//   goToPage,
-// };
-
+import { db, auth } from '../../config/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchData } from '../../Redux/actions/productAction'
+import {paginationAction} from '../../Redux/reducers/PaginationReducer'
 function Product() {
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(1);
+  const dispatch = useDispatch()
   const navigate = useNavigate();
-  const cookie = useContext(CookieContext);
   const { contextemail, setConEmail, authUser, setauthUser } = useContext(LoginContext);
-  const getProductData = async () => {
-    const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_limit=5&_page=${page}`);
-    const data = await response.json();
-    setUsers((prev) => [...prev, ...data]);
-  };
-  const debounce = (callback, delay) => {
-    let timeoutId;
-    return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    };
-  };
-  const handleInfiniteScroll = useCallback(
-    debounce(() => {
-      try {
-        if (window.innerHeight + document.documentElement.scrollTop + 1 >=
-          document.documentElement.scrollHeight) {
-          setPage((prev) => prev + 1);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }),
-    []
-  );
+  const productData = useSelector((state) => state.product.data);
+  const loadingStatus = useSelector((state) => state.product.loading);
+  const productperpage = useSelector((state) => state.pagination.productperpage);
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchData = async () => {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_limit=5&_page=${page}`);
-      const data = await response.json();
-      if (isMounted) {
-        setUsers((prev) => [...prev, ...data]);
-      }
-    };
+    dispatch(fetchData())
+  }, []);
 
-    fetchData();
-    return () => {
-      isMounted = false;
-    };
-  }, [page]);
+  const totalPages = Math.ceil(productData.length / productperpage);
+  const pages = [...Array(totalPages + 1).keys()].slice(1);
+  const indexOfLastPage = currentPage * productperpage;
+  const indexOfFirstPage = indexOfLastPage - productperpage;
+  const visibleProduct = productData.slice(indexOfFirstPage, indexOfLastPage);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleInfiniteScroll);
-    return () => window.removeEventListener("scroll", handleInfiniteScroll);
-  }, [handleInfiniteScroll]);
-
+const navigatePrev = ()=>{
+  if(currentPage !== 1){
+    console.log('clicked prev')
+    dispatch(paginationAction.onNavigatePrev())
+   
+  }
+}
+const navigateNext = ()=>{
+  if(currentPage !== totalPages){
+    dispatch(paginationAction.onNavigateNext())
+  }
+}
   useEffect(() => {
     async function getData() {
       const docRef = collection(db, "usersInfo");
       const docSnap = await getDocs(docRef);
-      console.log('doc', docSnap)
       docSnap.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.data());
+        doc.data()
       });
     }
     getData()
-
   }, [])
-  // console.log(document.cookie.match(/userToken=([^;]+)/));
-  // const toCheckUser = document.cookie.match(/userToken=([^;]+)/);
 
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -132,12 +75,16 @@ function Product() {
       setauthUser(false);
     }
   })
-  // const { currentPage, currentItems, totalPages, nextPage, prevPage, goToPage } = usePagination(users, itemsPerPage);
+
   return (
     <>
       <Navbarsep />
       <Carousel />
-      {users.map((element) => (
+
+      {
+        loadingStatus ?
+          <CircularProgress color='secondary' /> : null}
+      {visibleProduct.map((element) => (
         <div className={`${styles.card} ${styles.cardstyle}`} key={element.id}>
           <Card sx={{ maxWidth: 345 }}>
             <CardActionArea>
@@ -173,8 +120,17 @@ function Product() {
               </div>
             </CardActions>
           </Card>
+
         </div>
       ))}
+      <p >
+        <button className={`${pagestyle.button}`} onClick={navigatePrev()}>Prev</button>
+        {pages.map((p) => (
+          <span className={`${pagestyle.button}`} key={p}>{p}</span>
+        ))}
+         <button className={`${pagestyle.button}`} onClick={navigateNext()}>Next</button>
+      </p>
+     
     </>
   );
 }
